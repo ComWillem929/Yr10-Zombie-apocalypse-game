@@ -26,6 +26,13 @@
 
    var zombie_map;
 
+   var tolerance = 10;
+   
+   var count =0;
+
+   var health = 0;
+
+
 var data = `-33.327310590626745 115.63208157539368 zombie.png
 -33.327328519487764 115.63190991401673 zombie.png
 -33.32735093055886 115.63227737665177 zombie.png
@@ -112,10 +119,6 @@ var data = `-33.327310590626745 115.63208157539368 zombie.png
    var markers = data.split("\n");
 
    var all_markers=[];
-   
-   var count =0;
-
-
 
    function initMap() {
 
@@ -124,27 +127,63 @@ var data = `-33.327310590626745 115.63208157539368 zombie.png
    center: {lat: -33.327617, lng: 115.633066}
 
 });
-
+}
    if (navigator.geolocation) {
-navigator.geolocation.watchPosition(set_my_position);
+   navigator.geolocation.watchPosition(set_my_position);
 }
    else {
 
    alert("Geolocation doesn't work in your browser");
 }
 
-   function set_my_position(position) {
-
-var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-console.log(pos);
-
-var marker = new google.maps.Marker({
-position: pos,
-icon: "player.png",
-map: zombie_map
+   old_position = new google.maps.Marker({
+   position: {lat: -33.327617, lng: 115.633066}, 
+   map: zombie_map
 
 });
 
+   function set_my_position(position) {
+
+   old_position.setMap(null);
+
+   var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+   console.log(pos);
+
+   var marker = new google.maps.Marker({
+   position: pos,
+   icon: "player.png",
+   map: zombie_map
+
+});
+   old_position = marker;
+
+   for (var i=0; i<all_markers.length; i++) {
+   var distance = google.maps.geometry.sperical.computeDistanceBetween(pos, all_markers[i].getPosition());
+   console.log(distance);
+   if (distance <tolerance ){
+   var what_is_it = allmarkers[i].getIcon();
+   what_is_it = what_is_it.replace(".png", "");
+   alert("found the"+ what_is_it);
+   console.log(health)
+
+
+
+   all_markers[i].setMap(null);
+
+   if (what_is_it = "zombie") {
+   health +=30;
+   alert ("Your health is "+health);
+   all_markers[i].setMap(null);
+   console.log(health)
+}
+   else {
+   health -=10
+   alert ("Your health is "+health);
+   console.log(count);
+
+
+}
+}
 
 }
    if (count<1) {
@@ -165,15 +204,15 @@ map: zombie_map
 
 }
 
-count++
+   count++;
 
 }
 }
 
 </script>
 
- <script async defer
-   src ="https://maps.googleapis.com/maps/api/js?key=AIzaSyAY7sdodkj0CeUSEmQEVWDbFnF6FtTaOWc&callback=initMap">
+<script async defer
+   src ="https://maps.googleapis.com/maps/api/js?key=AIzaSyAY7sdodkj0CeUSEmQEVWDbFnF6FtTaOWc&callback=initMap&libraries=geometry">
 
 </script>
 
